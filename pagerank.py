@@ -7,7 +7,7 @@ class pageRank:
 
     def __init__(self, cover, MM):
         self.damping=0.7
-        self.epsilon=0.001
+        self.epsilon=1
         self.cover=cover
         self.alpha=0.001
         self.MM=MM
@@ -163,6 +163,8 @@ class pageRank:
         for i in range(0, plen):
             x0.append(float(0))
 
+        counting=1
+
         while True:
 
             temp = dot(self.P, x0)
@@ -180,6 +182,9 @@ class pageRank:
             if dist < self.epsilon:
                 break
             else:
+                for i in range(0, plen):
+                    vector[i]=vector[i]**counting
+                counting=counting+1
                 x0 = x1
 
         self.x=x1
@@ -236,12 +241,15 @@ def traceFileOpen(intrain, outtrain, fileN, version):
     columns=len(Matrix[0])
 
     tempIn=[]
+    c=2
+    while(True):
+        if Matrix[rows-1][c]!="FAIL" and Matrix[rows-1][c]!="PASS":
+            break
 
-    for c in range(2, columns):
         if Matrix[rows-1][c]=="FAIL":
-            outtrain.append([0])
-        else:
             outtrain.append([1])
+        else:
+            outtrain.append([0])
         for r in range(2, rows-1):
             if Matrix[r][c]=="0" or Matrix[r][c]==0L:
                 tempIn.append(0)
@@ -253,63 +261,57 @@ def traceFileOpen(intrain, outtrain, fileN, version):
         if tempIn!=[]:
             intrain.append(tempIn)
         tempIn=[]
+        c=c+1
 
 if __name__=='__main__':
     sys.setrecursionlimit(1000000000)
 
-    version = 5
-    intrain = []
-    outtrain = []
-   # fileN = "C:/Users/Jeongsu Jang/Desktop/2018-1/paper/RBF+pageRank/correcting-pagerank/printtokens.xlsx"
-   # print fileN
-   # traceFileOpen(intrain, outtrain, fileN, version)
+    version = 1
+    while(version<42):
+        intrain = []
+        outtrain = []
+        fileN = "C:/Users/Jeongsu Jang/Desktop/2018-1/paper/RBF+pageRank/experiment/schedule/schedule.xlsx"
+        print fileN
+        traceFileOpen(intrain, outtrain, fileN, version)
 
-   # intrain=extractFailureIntrain(intrain, outtrain)
+        intrain=extractFailureIntrain(intrain, outtrain)
 
-    intrain=[[1,1,1,1,0,0,0,1,1,1],
-             [1,0,1,1,1,1,1,1,0,1]]
-
-    LOC = len(intrain[0])
-    numTest=len(intrain)
+        LOC = len(intrain[0])
+        numTest=len(intrain)
 
 
-    temp=[]
-    MM=[]
-    for i in range(0, LOC):
-        for j in range(0, LOC):
-            temp.append(0)
-        MM.append(temp)
         temp=[]
+        MM=[]
+        for i in range(0, LOC):
+            for j in range(0, LOC):
+                temp.append(0)
+            MM.append(temp)
+            temp=[]
 
-    cover=[]
-    for i in range(0, LOC):
-        for j in range(0, numTest):
-            temp.append(intrain[j][i])
-        cover.append(temp)
-        temp=[]
+        cover=[]
+        for i in range(0, LOC):
+            for j in range(0, numTest):
+                temp.append(intrain[j][i])
+            cover.append(temp)
+            temp=[]
 
-    pr=pageRank(cover,MM)
-    pr.calCompute()
-    pr.calNormalized()
-
-    print pr.norX
+        pr=pageRank(cover,MM)
+        pr.calCompute()
+        pr.calNormalized()
 
 
- #   save='C:/Users/Jeongsu Jang/Desktop/2018-1/paper/RBF+pageRank/correcting-pagerank/Testv'+str(version)+'.txt'
- #   f=open(save, 'w+')
- #   for i in range(0, numTest):
- #       f.write(str(pr.norTest[i][0])+"\n")
- #       print pr.norTest[i][0]
-#
- #   f.close()
- #   print "-------------------X-----------------"
+        save='C:/Users/Jeongsu Jang/Desktop/2018-1/paper/RBF+pageRank/experiment/schedule/Testv'+str(version)+'.txt'
+        f=open(save, 'w+')
+        for i in range(0, numTest):
+            f.write(str(pr.norTest[i][0])+"\n")
 
- #   save='C:/Users/Jeongsu Jang/Desktop/2018-1/paper/RBF+pageRank/correcting-pagerank/Xv'+str(version)+'.txt'
- #   f=open(save, 'w+')
- #   for i in range(0, LOC):
- #       f.write(str(pr.norX[i])+"\n")
- #       print pr.norX[i]
+        f.close()
 
-#    f.close()
-#    version=version+1
+        save='C:/Users/Jeongsu Jang/Desktop/2018-1/paper/RBF+pageRank/experiment/schedule/Xv'+str(version)+'.txt'
+        f=open(save, 'w+')
+        for i in range(0, LOC):
+            f.write(str(pr.norX[i])+"\n")
+
+        f.close()
+        version=version+1
 
